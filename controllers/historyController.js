@@ -25,3 +25,28 @@ exports.getHistory = async (req, res, next) => {
         history
     })
 }
+
+//get single history - /api/v1/history/:id
+const mongoose = require('mongoose');
+
+exports.getSingleHistory = async (req, res, next) => {
+    try {
+        const isValidObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+        if (!isValidObjectId) {
+            return next(new ErrorHandler(`Resource not found: ${req.params.id}`, 400));
+        }
+
+        const history = await History.findById(req.params.id);
+
+        if (!history) {
+            return next(new ErrorHandler('History not found', 404));
+        }
+
+        res.status(200).json({
+            success: true,
+            history
+        });
+    } catch (err) {
+        next(err);
+    }
+};

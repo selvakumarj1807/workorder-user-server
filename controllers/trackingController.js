@@ -25,3 +25,28 @@ exports.getTracking = async (req, res, next) => {
         tracking
     })
 }
+
+//get single tracking - /api/v1/tracking/:id
+const mongoose = require('mongoose');
+
+exports.getSingleTracking = async (req, res, next) => {
+    try {
+        const isValidObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+        if (!isValidObjectId) {
+            return next(new ErrorHandler(`Resource not found: ${req.params.id}`, 400));
+        }
+
+        const tracking = await Tracking.findById(req.params.id);
+
+        if (!tracking) {
+            return next(new ErrorHandler('Tracking not found', 404));
+        }
+
+        res.status(200).json({
+            success: true,
+            tracking
+        });
+    } catch (err) {
+        next(err);
+    }
+};
