@@ -26,3 +26,27 @@ exports.getInvoice = async (req, res, next) => {
     })
 }
 
+//get single invoice - /api/v1/invoice/:id
+const mongoose = require('mongoose');
+
+exports.getSingleInvoice = async (req, res, next) => {
+    try {
+        const isValidObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+        if (!isValidObjectId) {
+            return next(new ErrorHandler(`Resource not found: ${req.params.id}`, 400));
+        }
+
+        const invoice = await Invoice.findById(req.params.id);
+
+        if (!invoice) {
+            return next(new ErrorHandler('invoice not found', 404));
+        }
+
+        res.status(200).json({
+            success: true,
+            invoice
+        });
+    } catch (err) {
+        next(err);
+    }
+};
