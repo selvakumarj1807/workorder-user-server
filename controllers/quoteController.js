@@ -78,3 +78,28 @@ exports.deleteQuote = async (req, res, next) => {
         });
     }
 }
+
+//get single quote - /api/v1/quote/:id
+const mongoose = require('mongoose');
+
+exports.getSingleQuote = async (req, res, next) => {
+    try {
+        const isValidObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+        if (!isValidObjectId) {
+            return next(new ErrorHandler(`Resource not found: ${req.params.id}`, 400));
+        }
+
+        const quote = await Quote.findById(req.params.id);
+
+        if (!quote) {
+            return next(new ErrorHandler('quote not found', 404));
+        }
+
+        res.status(200).json({
+            success: true,
+            quote
+        });
+    } catch (err) {
+        next(err);
+    }
+};
